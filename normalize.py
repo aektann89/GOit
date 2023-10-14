@@ -12,5 +12,7 @@ for cyrillic, latin in zip(CYRILLIC_SYMBOLS, TRANSLATION):
 
 
 def normalize(name: str) -> str:
-    translate_name = re.sub(r'\W', '_.', name.translate(TRANS))
-    return translate_name
+    translate_name = name.split('.')
+    translate_name[0] = re.sub(r'\W', '_', translate_name[0].translate(TRANS))
+    my_name = ('.'.join(translate_name))
+    return my_name
