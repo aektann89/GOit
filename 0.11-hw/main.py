@@ -33,9 +33,12 @@ class Birthday(Field):
             raise ValueError("Неправильний формат дня народження")
 
 class Record:
-    def __init__(self, name_value):
+    def __init__(self, name_value, birthday_value=None):
         self.name = Name(name_value)
         self.phones = []
+        self.birthday = None
+        if birthday_value:
+            self.birthday = Birthday(birthday_value)
 
     def add_phone(self, phone_value):
         phone = Phone(phone_value)
@@ -55,6 +58,15 @@ class Record:
 
     def find_phone(self, phone_value):
         return next((phone for phone in self.phones if phone.value == phone_value), None)
+    
+    def days_to_birthday(self):
+        if not self.birthday:
+            return None
+        today = datetime.now()
+        next_birthday = datetime(today.year, self.birthday.value.month, self.birthday.value.day)
+        if today > next_birthday:
+            next_birthday = datetime(today.year + 1, self.birthday.value.month, self.birthday.value.day)
+        return (next_birthday - today).days
 
 class AddressBook(UserDict):
     def __init__(self):
@@ -69,3 +81,9 @@ class AddressBook(UserDict):
     def delete(self, name_value):
         if name_value in self.data:
             del self.data[name_value]
+
+    def iterator(self, n=1):
+        # Генератор, що повертає уявлення для N записів
+        records = list(self.data.values())
+        for i in range(0, len(records), n):
+            yield records[i:i + n]
